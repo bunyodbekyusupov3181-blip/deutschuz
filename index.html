@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DeutschUz — Nemis tilini o'rganing</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --cream: #F5F0E8;
+      --ink: #1C1C1A;
+      --gold: #C4973A;
+      --muted: #7A7670;
+      --surface: #EDEAE3;
+      --border: rgba(28,28,26,0.12);
+      --green: #2D6A4F;
+      --red: #8B2020;
+      --white: #ffffff;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--cream);
+      color: var(--ink);
+      min-height: 100vh;
+    }
+
+    /* HEADER */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 28px;
+      border-bottom: 1px solid var(--border);
+      background: var(--cream);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .logo {
+      font-family: 'DM Serif Display', serif;
+      font-size: 22px;
+      letter-spacing: -0.5px;
+    }
+
+    .logo span { color: var(--gold); }
+
+    .nav-tabs {
+      display: flex;
+      gap: 4px;
+      background: var(--surface);
+      border-radius: 10px;
+      padding: 4px;
+    }
+
+    .nav-tab {
+      padding: 6px 12px;
+      border: none;
+      background: transparent;
+      border-radius: 7px;
+      font-size: 13px;
+      font-family: 'DM Sans', sans-serif;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .nav-tab.active {
+      background: var(--cream);
+      color: var(--ink);
+      font-weight: 500;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+
+    .header-right {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+    }
+
+    .streak-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      color: var(--gold);
+      font-weight: 500;
+    }
+
+    .xp-bar-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .xp-bar {
+      width: 80px;
+      height: 6px;
+      background: var(--surface);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .xp-fill {
+      height: 100%;
+      background: var(--gold);
+      border-radius: 3px;
+      transition: width 0.5s ease;
+    }
+
+    /* SCREENS */
+    .screen { display: none; padding: 28px; max-width: 900px; margin: 0 auto; }
+    .screen.active { display: block; }
+
+    .section-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 28px;
+      margin-bottom: 6px;
+      letter-spacing: -0.5px;
+    }
+
+    .section-sub {
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 24px;
+    }
+
+    /* LESSONS */
+    .lessons-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+      gap: 14px;
+    }
+
+    .lesson-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .lesson-card:hover:not(.locked) {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.07);
+    }
+
+    .lesson-card.locked { opacity: 0.4; cursor: not-allowed; }
+
+    .lesson-card.done::after {
+      content: '✓';
+      position: absolute;
+      top: 12px; right: 14px;
+      color: var(--green);
+      font-weight: 500;
+      font-size: 16px;
+    }
+
+    .lesson-emoji { font-size: 30px; margin-bottom: 10px; }
+    .lesson-title { font-weight: 500; font-size: 15px; margin-bottom: 4px; }
+    .lesson-desc { font-size: 12px; color: var(--muted); }
+
+    .lesson-pill {
+      display: inline-block;
+      margin-top: 10px;
+      font-size: 11px;
+      padding: 3px 10px;
+      border-radius: 20px;
+      background: var(--surface);
+      color: var(--muted);
+    }
+
+    .lesson-pill.new { background: #FFF3DC; color: #8B6020; }
+
+    /* VOCAB */
+    .vocab-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 10px;
+    }
+
+    .vocab-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.18s;
+    }
+
+    .vocab-card:hover { border-color: var(--gold); }
+    .vocab-de { font-family: 'DM Serif Display', serif; font-size: 18px; margin-bottom: 4px; }
+    .vocab-uz { font-size: 12px; color: var(--muted); }
+    .vocab-ex { font-size: 11px; color: var(--gold); margin-top: 6px; font-style: italic; }
+
+    /* QUIZ */
+    .quiz-wrap { max-width: 520px; margin: 0 auto; }
+
+    .quiz-progress { display: flex; gap: 6px; margin-bottom: 28px; }
+
+    .quiz-dot {
+      flex: 1;
+      height: 4px;
+      border-radius: 2px;
+      background: var(--surface);
+      transition: background 0.3s;
+    }
+
+    .quiz-dot.done { background: var(--gold); }
+    .quiz-dot.current { background: var(--ink); }
+
+    .quiz-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .quiz-q-label {
+      font-size: 11px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 12px;
+    }
+
+    .quiz-word {
+      font-family: 'DM Serif Display', serif;
+      font-size: 38px;
+      margin-bottom: 8px;
+      letter-spacing: -1px;
+    }
+
+    .quiz-hint { font-size: 13px; color: var(--muted); }
+
+    .quiz-options {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .quiz-opt {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px;
+      font-size: 14px;
+      font-family: 'DM Sans', sans-serif;
+      cursor: pointer;
+      transition: all 0.15s;
+      color: var(--ink);
+    }
+
+    .quiz-opt:hover:not(:disabled) { border-color: var(--ink); }
+    .quiz-opt.correct { border-color: var(--green); background: #EAF4EE; color: var(--green); }
+    .quiz-opt.wrong { border-color: var(--red); background: #FCEAEA; color: var(--red); }
+
+    .feedback-msg {
+      text-align: center;
+      font-size: 14px;
+      margin-top: 16px;
+      min-height: 20px;
+      font-weight: 500;
+    }
+
+    .feedback-msg.correct { color: var(--green); }
+    .feedback-msg.wrong { color: var(--red); }
+
+    .reset-btn {
+      display: block;
+      width: 100%;
+      padding: 14px;
+      margin-top: 12px;
+      background: var(--ink);
+      color: var(--cream);
+      border: none;
+      border-radius: 10px;
+      font-size: 14px;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 500;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+
+    .reset-btn:hover { opacity: 0.85; }
+
+    /* GRAMMAR */
+    .grammar-section { margin-bottom: 32px; }
+
+    .grammar-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 20px;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .grammar-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+      background: var(--white);
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+
+    .grammar-table th {
+      background: var(--surface);
+      padding: 10px 14px;
+      text-align: left;
+      font-weight: 500;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--muted);
+    }
+
+    .grammar-table td {
+      padding: 10px 14px;
+      border-top: 1px solid var(--border);
+    }
+
+    .grammar-table td:first-child { color: var(--muted); font-size: 13px; }
+    .grammar-table td:nth-child(2) { font-family: 'DM Serif Display', serif; font-size: 16px; }
+    .grammar-table td:nth-child(3) { font-size: 13px; }
+
+    .phrase-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px 20px;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .phrase-de { font-family: 'DM Serif Display', serif; font-size: 16px; }
+    .phrase-uz { font-size: 13px; color: var(--muted); margin-top: 3px; }
+
+    .phrase-tag {
+      font-size: 11px;
+      padding: 3px 10px;
+      border-radius: 20px;
+      background: var(--surface);
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    /* STATS */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+
+    .stat-box {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .stat-num {
+      font-family: 'DM Serif Display', serif;
+      font-size: 32px;
+      color: var(--gold);
+    }
+
+    .stat-label { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+    /* MOBILE */
+    @media (max-width: 600px) {
+      .header { padding: 12px 16px; }
+      .screen { padding: 16px; }
+      .nav-tab { padding: 5px 8px; font-size: 12px; }
+      .quiz-word { font-size: 30px; }
+      .stats-grid { grid-template-columns: repeat(3, 1fr); }
+      .header-right { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">Deutsch<span>Uz</span></div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showScreen('home', this)">Darslar</button>
+    <button class="nav-tab" onclick="showScreen('vocab', this)">So'zlar</button>
+    <button class="nav-tab" onclick="showScreen('quiz', this)">Test</button>
+    <button class="nav-tab" onclick="showScreen('grammar', this)">Grammatika</button>
+  </div>
+  <div class="header-right">
+    <div class="streak-badge">🔥 <span id="streak">3</span> kun</div>
+    <div class="xp-bar-wrap">
+      <span id="xp-label">42 XP</span>
+      <div class="xp-bar"><div class="xp-fill" id="xp-fill" style="width:42%"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- HOME -->
+<div class="screen active" id="screen-home">
+  <div class="section-title">Salom! Bugun ham o'rganamiz.</div>
+  <div class="section-sub">Nemis tilini bosqichma-bosqich o'rganish yo'lingiz.</div>
+  <div class="stats-grid">
+    <div class="stat-box"><div class="stat-num" id="stat-done">2</div><div class="stat-label">Tugatilgan dars</div></div>
+    <div class="stat-box"><div class="stat-num" id="stat-xp">42</div><div class="stat-label">Jami XP</div></div>
+    <div class="stat-box"><div class="stat-num">3</div><div class="stat-label">Kun davomiylik</div></div>
+  </div>
+  <div class="lessons-grid" id="lessons-container"></div>
+</div>
+
+<!-- VOCAB -->
+<div class="screen" id="screen-vocab">
+  <div class="section-title">So'z boyligi</div>
+  <div class="section-sub">Muhim nemis so'zlari va ularning ma'nolari</div>
+  <div class="vocab-grid" id="vocab-container"></div>
+</div>
+
+<!-- QUIZ -->
+<div class="screen" id="screen-quiz">
+  <div class="section-title">Bilimingizni sinab ko'ring</div>
+  <div class="section-sub">To'g'ri tarjimani tanlang</div>
+  <div class="quiz-wrap">
+    <div class="quiz-progress" id="quiz-progress"></div>
+    <div class="quiz-card">
+      <div class="quiz-q-label">Nemischa so'z</div>
+      <div class="quiz-word" id="quiz-word"></div>
+      <div class="quiz-hint" id="quiz-hint"></div>
+    </div>
+    <div class="quiz-options" id="quiz-options"></div>
+    <div class="feedback-msg" id="feedback"></div>
+  </div>
+</div>
+
+<!-- GRAMMAR -->
+<div class="screen" id="screen-grammar">
+  <div class="section-title">Grammatika</div>
+  <div class="section-sub">Nemis tili grammatikasining asoslari</div>
+
+  <div class="grammar-section">
+    <div class="grammar-title">Artikl — der, die, das</div>
+    <table class="grammar-table">
+      <tr><th>Jins</th><th>Artikl</th><th>Misol</th></tr>
+      <tr><td>Erkak (Maskulin)</td><td>der</td><td>der Mann — erkak</td></tr>
+      <tr><td>Ayol (Feminin)</td><td>die</td><td>die Frau — ayol</td></tr>
+      <tr><td>O'rta (Neutrum)</td><td>das</td><td>das Kind — bola</td></tr>
+      <tr><td>Ko'plik</td><td>die</td><td>die Kinder — bolalar</td></tr>
+    </table>
+  </div>
+
+  <div class="grammar-section">
+    <div class="grammar-title">Olmoshlar — Pronomen</div>
+    <table class="grammar-table">
+      <tr><th>O'zbek</th><th>Nemis</th><th>Misol</th></tr>
+      <tr><td>Men</td><td>ich</td><td>Ich lerne — Men o'rganaman</td></tr>
+      <tr><td>Sen</td><td>du</td><td>Du sprichst — Sen gaplashasiz</td></tr>
+      <tr><td>U (erkak)</td><td>er</td><td>Er kommt — U keladi</td></tr>
+      <tr><td>U (ayol)</td><td>sie</td><td>Sie geht — U boradi</td></tr>
+      <tr><td>Biz</td><td>wir</td><td>Wir essen — Biz yeymiz</td></tr>
+      <tr><td>Siz (rasmiy)</td><td>Sie</td><td>Sie sprechen — Siz gaplashasiz</td></tr>
+    </table>
+  </div>
+
+  <div class="grammar-section">
+    <div class="grammar-title">Fe'l tuslanishi — sein (bo'lmoq)</div>
+    <table class="grammar-table">
+      <tr><th>Olmosh</th><th>Fe'l</th><th>Ma'nosi</th></tr>
+      <tr><td>ich</td><td>bin</td><td>Men — man</td></tr>
+      <tr><td>du</td><td>bist</td><td>Sen — san</td></tr>
+      <tr><td>er/sie/es</td><td>ist</td><td>U — dir</td></tr>
+      <tr><td>wir</td><td>sind</td><td>Biz — miz</td></tr>
+      <tr><td>ihr</td><td>seid</td><td>Sizlar — siz</td></tr>
+      <tr><td>Sie/sie</td><td>sind</td><td>Siz/ular — dir</td></tr>
+    </table>
+  </div>
+
+  <div class="grammar-section">
+    <div class="grammar-title">Kundalik iboralar</div>
+    <div id="phrases-container"></div>
+  </div>
+</div>
+
+<script>
+  const lessons = [
+    { emoji: '👋', title: 'Salomlashish', desc: 'Hallo, Guten Morgen...', status: 'done', tag: 'Tugallangan' },
+    { emoji: '🔢', title: 'Sonlar', desc: '1 dan 100 gacha', status: 'done', tag: 'Tugallangan' },
+    { emoji: '🎨', title: 'Ranglar', desc: 'rot, blau, grün...', status: 'active', tag: 'Yangi' },
+    { emoji: '👨‍👩‍👧', title: 'Oila', desc: 'Familie, Mutter, Vater...', status: 'active', tag: 'Yangi' },
+    { emoji: '🍎', title: 'Oziq-ovqat', desc: 'Brot, Milch, Apfel...', status: 'active', tag: 'Yangi' },
+    { emoji: '🕐', title: 'Vaqt', desc: 'Uhr, Stunde, Tag...', status: 'locked', tag: 'Yopiq' },
+    { emoji: '🏙️', title: 'Shahar', desc: 'Stadt, Straße, Platz...', status: 'locked', tag: 'Yopiq' },
+    { emoji: '💼', title: 'Ish & kasb', desc: 'Beruf, Arbeit, Büro...', status: 'locked', tag: 'Yopiq' },
+  ];
+
+  const vocab = [
+    { de: 'Hallo', uz: 'Salom', ex: 'Hallo! Wie geht\'s?' },
+    { de: 'Danke', uz: 'Rahmat', ex: 'Vielen Dank!' },
+    { de: 'Bitte', uz: 'Iltimos / Marhamat', ex: 'Bitte schön.' },
+    { de: 'Ja', uz: 'Ha', ex: 'Ja, natürlich.' },
+    { de: 'Nein', uz: 'Yo\'q', ex: 'Nein, danke.' },
+    { de: 'Wasser', uz: 'Suv', ex: 'Ein Glas Wasser.' },
+    { de: 'Brot', uz: 'Non', ex: 'Frisches Brot.' },
+    { de: 'Haus', uz: 'Uy', ex: 'Das Haus ist groß.' },
+    { de: 'Auto', uz: 'Mashina', ex: 'Das Auto fährt.' },
+    { de: 'Hund', uz: 'It', ex: 'Der Hund bellt.' },
+    { de: 'Katze', uz: 'Mushuk', ex: 'Die Katze schläft.' },
+    { de: 'Schule', uz: 'Maktab', ex: 'Ich gehe zur Schule.' },
+    { de: 'Arbeit', uz: 'Ish', ex: 'Ich gehe zur Arbeit.' },
+    { de: 'Familie', uz: 'Oila', ex: 'Meine Familie ist groß.' },
+    { de: 'Freund', uz: 'Do\'st', ex: 'Er ist mein Freund.' },
+    { de: 'Stadt', uz: 'Shahar', ex: 'Die Stadt ist schön.' },
+  ];
+
+  const quizWords = [
+    { de: 'Hallo', uz: 'Salom', hint: 'salomlashish' },
+    { de: 'Wasser', uz: 'Suv', hint: 'ichimlik' },
+    { de: 'Haus', uz: 'Uy', hint: 'ism (das)' },
+    { de: 'Danke', uz: 'Rahmat', hint: 'minnatdorchilik' },
+    { de: 'Schule', uz: 'Maktab', hint: 'ta\'lim joyi' },
+    { de: 'Familie', uz: 'Oila', hint: 'qarindoshlar' },
+    { de: 'Freund', uz: 'Do\'st', hint: 'yaqin kishi' },
+  ];
+
+  const phrases = [
+    { de: 'Wie heißt du?', uz: 'Ismingiz nima?', tag: 'Tanishish' },
+    { de: 'Ich komme aus Usbekistan.', uz: 'Men O\'zbekistondan kelganman.', tag: 'Kelib chiqish' },
+    { de: 'Wie viel kostet das?', uz: 'Bu qancha turadi?', tag: 'Savdo' },
+    { de: 'Wo ist die Toilette?', uz: 'Hojatxona qayerda?', tag: 'Yo\'l so\'rash' },
+    { de: 'Ich verstehe nicht.', uz: 'Men tushunmayapman.', tag: 'Aloqa' },
+    { de: 'Können Sie langsamer sprechen?', uz: 'Sekinroq gaplasha olasizmi?', tag: 'Aloqa' },
+    { de: 'Guten Morgen!', uz: 'Xayrli tong!', tag: 'Salomlashish' },
+    { de: 'Auf Wiedersehen!', uz: 'Xayr! Ko\'rishguncha!', tag: 'Xayrlashish' },
+  ];
+
+  let xp = 42;
+  let quizIdx = 0;
+  let answered = false;
+  let doneLessons = 2;
+
+  function showScreen(name, btn) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('screen-' + name).classList.add('active');
+    if (btn) btn.classList.add('active');
+    if (name === 'quiz') renderQuiz();
+  }
+
+  function renderLessons() {
+    const c = document.getElementById('lessons-container');
+    c.innerHTML = lessons.map(l => `
+      <div class="lesson-card ${l.status === 'locked' ? 'locked' : ''} ${l.status === 'done' ? 'done' : ''}"
+        onclick="${l.status === 'active' ? 'completeLesson(this)' : ''}">
+        <div class="lesson-emoji">${l.emoji}</div>
+        <div class="lesson-title">${l.title}</div>
+        <div class="lesson-desc">${l.desc}</div>
+        <span class="lesson-pill ${l.status === 'active' ? 'new' : ''}">${l.tag}</span>
+      </div>
+    `).join('');
+  }
+
+  function completeLesson(el) {
+    if (el.classList.contains('done')) return;
+    el.classList.remove('active');
+    el.classList.add('done');
+    const pill = el.querySelector('.lesson-pill');
+    pill.textContent = 'Tugallangan';
+    pill.classList.remove('new');
+    doneLessons++;
+    document.getElementById('stat-done').textContent = doneLessons;
+    gainXP(10);
+  }
+
+  function renderVocab() {
+    const c = document.getElementById('vocab-container');
+    c.innerHTML = vocab.map(v => `
+      <div class="vocab-card">
+        <div class="vocab-de">${v.de}</div>
+        <div class="vocab-uz">${v.uz}</div>
+        <div class="vocab-ex">${v.ex}</div>
+      </div>
+    `).join('');
+  }
+
+  function renderPhrases() {
+    const c = document.getElementById('phrases-container');
+    c.innerHTML = phrases.map(p => `
+      <div class="phrase-card">
+        <div>
+          <div class="phrase-de">${p.de}</div>
+          <div class="phrase-uz">${p.uz}</div>
+        </div>
+        <span class="phrase-tag">${p.tag}</span>
+      </div>
+    `).join('');
+  }
+
+  function renderQuiz() {
+    const total = quizWords.length;
+    const prog = document.getElementById('quiz-progress');
+    prog.innerHTML = quizWords.map((_, i) =>
+      `<div class="quiz-dot ${i < quizIdx ? 'done' : i === quizIdx ? 'current' : ''}"></div>`
+    ).join('');
+
+    if (quizIdx >= total) {
+      document.getElementById('quiz-word').textContent = 'Barakalla! 🎉';
+      document.getElementById('quiz-hint').textContent = 'Barcha ' + total + ' ta savolni bajardingiz!';
+      document.getElementById('quiz-options').innerHTML =
+        `<button class="reset-btn" style="grid-column:1/-1" onclick="resetQuiz()">Qaytadan boshlash</button>`;
+      document.getElementById('feedback').textContent = '';
+      return;
+    }
+
+    const q = quizWords[quizIdx];
+    document.getElementById('quiz-word').textContent = q.de;
+    document.getElementById('quiz-hint').textContent = q.hint;
+    document.getElementById('feedback').textContent = '';
+    answered = false;
+
+    const wrong = vocab.filter(v => v.uz !== q.uz).sort(() => Math.random() - 0.5).slice(0, 3).map(v => v.uz);
+    const opts = [...wrong, q.uz].sort(() => Math.random() - 0.5);
+
+    document.getElementById('quiz-options').innerHTML = opts.map(o => `
+      <button class="quiz-opt" onclick="checkAnswer(this, '${o}', '${q.uz.replace(/'/g, "\\'")}')">${o}</button>
+    `).join('');
+  }
+
+  function checkAnswer(el, chosen, correct) {
+    if (answered) return;
+    answered = true;
+    document.querySelectorAll('.quiz-opt').forEach(b => b.disabled = true);
+    const fb = document.getElementById('feedback');
+    if (chosen === correct) {
+      el.classList.add('correct');
+      fb.textContent = "To'g'ri! Ajoyib! ✓";
+      fb.className = 'feedback-msg correct';
+      gainXP(5);
+    } else {
+      el.classList.add('wrong');
+      document.querySelectorAll('.quiz-opt').forEach(b => {
+        if (b.textContent === correct) b.classList.add('correct');
+      });
+      fb.textContent = "Noto'g'ri. To'g'ri javob: " + correct;
+      fb.className = 'feedback-msg wrong';
+    }
+    setTimeout(() => { quizIdx++; renderQuiz(); }, 1500);
+  }
+
+  function resetQuiz() { quizIdx = 0; renderQuiz(); }
+
+  function gainXP(amount) {
+    xp = Math.min(xp + (amount || 3), 100);
+    document.getElementById('xp-label').textContent = xp + ' XP';
+    document.getElementById('xp-fill').style.width = xp + '%';
+    document.getElementById('stat-xp').textContent = xp;
+  }
+
+  renderLessons();
+  renderVocab();
+  renderPhrases();
+</script>
+</body>
+</html>
